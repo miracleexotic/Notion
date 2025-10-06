@@ -1,5 +1,6 @@
 from src.Notion.Base import Finance
 from src.Notion.Finance.month import Month
+from src.Utils.pdf import extract_TTB_pdf, spend_food_data_format
 
 import re
 import requests
@@ -109,7 +110,7 @@ class Food(Finance):
             print(new_data["properties"]["Amount"]["number"])
             print("---")
 
-    def create_by_date(self, start_date, end_date):
+    def create_by_date(self, start_date, end_date, file_ttb=None):
         print(f"Create {__class__.__name__} from {start_date} to {end_date}")
 
         sdate = date(*list(map(int, start_date.split("-"))))
@@ -117,9 +118,18 @@ class Food(Finance):
         date_ranges = pandas.date_range(sdate, edate, freq="d").to_list()
         date_ranges = list(map(lambda x: x.strftime("%Y-%m-%d"), date_ranges))
 
+        if file_ttb:
+            items_by_date = extract_TTB_pdf(file_ttb)
+
         for date_day in date_ranges:
 
             print(f"Date: {date_day}")
+
+            if file_ttb:
+                data = spend_food_data_format(items_by_date[date_day])
+            else:
+                data = "LineMan(), TrueMoney(), TTB(), Other()"
+
             response = requests.post(
                 url=f"https://api.notion.com/v1/pages/",
                 headers={
@@ -165,9 +175,9 @@ class Food(Finance):
                                 {
                                     "type": "text",
                                     "text": {
-                                        "content": "LineMan(), TrueMoney(), TTB(), Other()",
+                                        "content": data,
                                     },
-                                    "plain_text": "LineMan(), TrueMoney(), TTB(), Other()",
+                                    "plain_text": data,
                                 }
                             ],
                         },
