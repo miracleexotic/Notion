@@ -5,13 +5,60 @@ import pandas as pd
 import numpy as np
 
 
-def extract_TTB_pdf(filepath):
-    tables = camelot.read_pdf(filepath=filepath, flavor="stream", pages="all")
+def extract_TTB_pdf(filepath, debug=False):
 
+    # Create empty dataframe
     combined_df: pd.DataFrame = pd.DataFrame()
 
-    for t in tables[1:]:
+    #
+    # Manipulate first page of pdf
+    #
+    tables_first = camelot.read_pdf(
+        filepath=filepath, flavor="stream", pages="1", table_areas=["10,570,590,10"]
+    )
+
+    df = tables_first[0].df
+
+    # DEBUG:
+    if debug:
+        for i in tables_first:
+            camelot.plot(i, kind="grid").show()
+        input()
+        print(df)
+
+    # Set 1st row as header
+    df.columns = df.iloc[0].tolist()
+    df = df.drop(df.index[0]).reset_index(drop=True)
+
+    # Drop columns
+    drop_columns = ["Time", "Transaction", "Channel", "Balance"]
+    df = df.drop(columns=drop_columns)
+
+    # Drop empty row
+    df.replace("", np.nan, inplace=True)
+    df = df.dropna()
+
+    if not combined_df.empty:
+        combined_df = pd.concat([combined_df, df], ignore_index=True)
+    else:
+        combined_df = df
+
+    #
+    # Manipulate another pages of pdf
+    #
+    tables = camelot.read_pdf(
+        filepath=filepath, flavor="stream", pages="2-end", table_areas=["10,740,590,10"]
+    )
+
+    for t in tables:
         df = t.df
+
+        # DEBUG:
+        if debug:
+            for i in tables:
+                camelot.plot(i, kind="grid").show()
+            input()
+            print(df)
 
         # Set 1st row as header
         df.columns = df.iloc[0].tolist()
@@ -104,10 +151,10 @@ def spend_traffic_data_format(data: list):
 
 
 if __name__ == "__main__":
-    items_by_date = extract_TTB_pdf("data/AccountStatement_30092025.pdf")
+    items_by_date = extract_TTB_pdf("data/AccountStatement_01112025.pdf")
 
-    start_date = "2025-09-01"
-    end_date = "2025-09-30"
+    start_date = "2025-10-01"
+    end_date = "2025-10-31"
 
     sdate = date(*list(map(int, start_date.split("-"))))
     edate = date(*list(map(int, end_date.split("-"))))
