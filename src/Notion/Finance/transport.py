@@ -115,9 +115,12 @@ class Transport(Finance):
             print(f"Date: {date_day}")
 
             if file_ttb:
-                data = spend_traffic_data_format(items_by_date[date_day])
+                try:
+                    data = spend_traffic_data_format(items_by_date[date_day])
+                except KeyError as e:
+                    data = "0"
             else:
-                data = 0
+                data = "0"
 
             response = requests.post(
                 url="https://api.notion.com/v1/pages/",

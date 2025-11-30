@@ -126,7 +126,10 @@ class Food(Finance):
             print(f"Date: {date_day}")
 
             if file_ttb:
-                data = spend_food_data_format(items_by_date[date_day])
+                try:
+                    data = spend_food_data_format(items_by_date[date_day])
+                except KeyError as e:
+                    data = "LineMan(), TrueMoney(), TTB(), Other()"
             else:
                 data = "LineMan(), TrueMoney(), TTB(), Other()"
 

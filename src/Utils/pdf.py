@@ -151,10 +151,10 @@ def spend_traffic_data_format(data: list):
 
 
 if __name__ == "__main__":
-    items_by_date = extract_TTB_pdf("data/AccountStatement_01112025.pdf")
+    items_by_date = extract_TTB_pdf("data/AccountStatement_01122025.pdf", debug=False)
 
-    start_date = "2025-10-01"
-    end_date = "2025-10-31"
+    start_date = "2025-11-01"
+    end_date = "2025-11-30"
 
     sdate = date(*list(map(int, start_date.split("-"))))
     edate = date(*list(map(int, end_date.split("-"))))
@@ -163,5 +163,13 @@ if __name__ == "__main__":
 
     for date_day in date_ranges:
         print(date_day)
-        print(spend_food_data_format(items_by_date[date_day]))
-        print(spend_traffic_data_format(items_by_date[date_day]))
+
+        try:
+            print(spend_food_data_format(items_by_date[date_day]))
+        except KeyError as e:
+            print(f"{date_day}: Food data not found.")
+
+        try:
+            print(spend_traffic_data_format(items_by_date[date_day]))
+        except KeyError as e:
+            print(f"{date_day}: Traffic data not found.")

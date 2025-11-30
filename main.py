@@ -10,9 +10,9 @@ if __name__ == "__main__":
     transport = Transport(config["BEARER_TOKEN"])
     wash = Wash(config["BEARER_TOKEN"])
 
-    start_date = "2025-10-01"
-    end_date = "2025-10-31"
-    file_ttb = "data/AccountStatement_01112025.pdf"
+    start_date = "2025-11-01"
+    end_date = "2025-11-30"
+    file_ttb = "data/AccountStatement_01122025.pdf"
 
     # ------ #
     # CREATE #
