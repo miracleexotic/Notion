@@ -18,7 +18,14 @@ class Transport(Finance):
     def __str__(self):
         return f"Database id [{__class__.__name__}]: {self.database_id}"
 
-    def sum_price(self, note: str):
+    def sum_price(self, data: str):
+        note = data["properties"]["Note"]["rich_text"][0]["plain_text"]
+
+        if not len(data["properties"]["Note"]["rich_text"]) or not note:
+            return 0
+        if note.startswith("#"):
+            return data["properties"]["Amount"]["number"]
+
         amount = sum(list(map(lambda x: float(x.strip()), note.split(","))))
         print("total =", amount)
 
@@ -82,17 +89,7 @@ class Transport(Finance):
                     "Content-Type": "application/json",
                     "Notion-Version": self._notion_version,
                 },
-                json={
-                    "properties": {
-                        "Amount": (
-                            self.sum_price(
-                                data["properties"]["Note"]["rich_text"][0]["plain_text"]
-                            )
-                            if len(data["properties"]["Note"]["rich_text"])
-                            else 0
-                        )
-                    }
-                },
+                json={"properties": {"Amount": self.sum_price(data)}},
             )
 
             new_data = response.json()
