@@ -108,7 +108,7 @@ def convert_amount(amount: str):
 
 def get_category(details: str):
     categories = {
-        "LineMan": ["LINE MAN"],
+        "LineMan": ["LINE MAN", "LPTH*PF_LM_"],
         "TrueMoney": ["True Money"],
         "Traffic": ["MRT-", "BTS", "WWW.GRAB.COM"],
     }
